@@ -1,13 +1,13 @@
 #define NAME         "xadUnTar"
 #define DISTRIBUTION "(LGPL) "
-#define REVISION     "8"
-#define DATE         "04.02.2005"
+#define REVISION     "9"
+#define DATE         "22.06.2026"
 
 /*  $Id$
     xadUnTar - dearchives tar archives (also gzipped, bzipped, compressed)
 
     XAD library system for archive handling
-    Copyright (C) 1998 and later by Dirk Stöcker <soft@dstoecker.de>
+    Copyright (C) 1998 and later by Dirk StÃ¶cker <soft@dstoecker.de>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -164,6 +164,7 @@ struct TarBlockInfo {
 #define TF_LONGNAME     'L'  /* longname block, preceedes the full block */
 #define TF_LONGLINK     'K'  /* longlink block, preceedes the full block */
 #define TF_EXTENSION    'x'  /* XXX */
+#define TF_GLOBAL_HEADER 'g' /* PAX global extended header */
 
 HOOKPROTONO(progrhook, ULONG, struct xadProgressInfo *pi);
 HOOKPROTONO(workhook, ULONG, struct xadHookParam *pi);
@@ -474,6 +475,10 @@ static LONG handleblock(struct TarBlockInfo *t)
       {
         t->LongNameMode = 1;
         t->NeedToSave = t->HookArgs.size;
+      }
+      else if(ok && t->Header.th_Typeflag == TF_GLOBAL_HEADER)
+      {
+        t->NeedToSkip = t->HookArgs.size;
       }
       else if(ok && (t->Header.th_Typeflag == TF_FILE || t->Header.th_Typeflag == TF_AFILE ||
       t->Header.th_Typeflag == TF_EXTENSION ||
